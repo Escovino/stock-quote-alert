@@ -1,5 +1,6 @@
 using System;
-
+using StockPriceMonitor.Services;
+//TODO Revisar progam
 namespace StockPriceMonitor
 {
     class Program

@@ -1,9 +1,9 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using System.Timers;
-using Utils;
-using Models;
+using StockQuoteAlert.Models;
 
 namespace StockQuoteAlert.Services
 {
@@ -12,9 +12,9 @@ namespace StockQuoteAlert.Services
         private Stock _stock;
         private EmailService _emailService;
 
-        public StockQuoteAlertService(Stock stock, EmailService emailService)
+        public StockQuoteAlertService(string assetSymbol, decimal sellingPrice, decimal buyingPrice)
         {
-            _stock = stock;
+            _stock = new Stock(assetSymbol, sellingPrice, buyingPrice);
             _emailService = emailService;
             _timer = new Timer(60000); // Check every minute
             _timer.Elapsed += async (sender, e) => await MonitorPrice();
@@ -33,15 +33,11 @@ namespace StockQuoteAlert.Services
         private async Task MonitorPrice()
         {
             var currentPrice = await GetCurrentPrice();
-            if (currentPrice < _buyingPrice)
-            {
-                // Trigger alert for buying price
-                // EmailService.SendEmailAlert($"Price Alert: {_asset} is below the buying price of {_buyingPrice}. Current price: {currentPrice}");
-            }
-            else if (currentPrice > _sellingPrice)
-            {
-                // Trigger alert for selling price
-                // EmailService.SendEmailAlert($"Price Alert: {_asset} is above the selling price of {_sellingPrice}. Current price: {currentPrice}");
+            if(_stock.SalesSituationChanged){
+                var salesSituation = _stock.SalesSituation(currentPrice);
+                var subject = $"Stock Alert: {_stock.AssetSymbol} - {salesSituation}";
+                var body = $"Current price: {currentPrice}";
+                _emailService.SendEmailAlert(null, subject, body);//TODO Revisar o serviço de envio de email
             }
         }
 
@@ -49,10 +45,10 @@ namespace StockQuoteAlert.Services
         {
             using (var httpClient = new HttpClient())
             {
-                var response = await httpClient.GetStringAsync($"{ApiUrl}?symbol={_asset}");
-                // Parse response to get the current price
-                // This is a placeholder; actual implementation will depend on the API response format
-                return decimal.Parse(response); 
+                var response = await httpClient.GetStringAsync($"https://brapi.dev/api/quote/{_stock.AssetSymbol}?token=kfhjUmDuFEZusvXsvucSoT");
+                var json = JObject.Parse(response);
+                var currentPrice = json["results"][0]["regularMarketPrice"].Value<decimal>();
+                return currentPrice;
             }
         }
     }

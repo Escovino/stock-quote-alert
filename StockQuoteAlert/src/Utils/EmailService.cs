@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Mail;
-
+//TODO Revisar o serviço de envio de email
 namespace StockPriceMonitor.Utils
 {
     public class EmailService
