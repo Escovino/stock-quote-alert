@@ -14,7 +14,7 @@ namespace StockQuoteAlert.Models
             this.SellingPrice = sellPrice;
             this.BuyingPrice = buyPrice;
             this.SalesSituationChange = false;
-            this.LastSalesSituation = 2;
+            this.LastSalesSituation = '';
         }
     
         public string SalesSituation(int price)
