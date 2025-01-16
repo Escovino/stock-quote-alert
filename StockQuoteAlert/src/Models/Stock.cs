@@ -1,4 +1,3 @@
-using Services.Api; //Isso aqui está errado, não existe um namespace Services.Api
 public class Stock
 {
     private string Symbol { get; set; }
@@ -12,9 +11,8 @@ public class Stock
         BuyPrice = buyPrice;
     }
 
-    public int SalesSituation()
+    public int SalesSituation(int price)
     {
-        decimal situation = Api.GetSituation(Symbol);
-        return situation > SellPrice ? 1 : situation < BuyPrice ? -1 : 0;
+        return price > SellPrice ? 1 : price < BuyPrice ? -1 : 0;
     }
 }
