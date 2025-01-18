@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Timers;
 using StockQuoteAlert.Models;
+using StockQuoteAlert.Utils;
 
 namespace StockQuoteAlert.Services
 {
@@ -11,10 +12,11 @@ namespace StockQuoteAlert.Services
     {
         private Stock _stock;
         private EmailService _emailService;
+        private Timer _timer;
 
-        public StockQuoteAlertService(string assetSymbol, decimal sellingPrice, decimal buyingPrice)
+        public StockQuoteAlertService(Stock stock, EmailService emailService)
         {
-            _stock = new Stock(assetSymbol, sellingPrice, buyingPrice);
+            _stock = stock;
             _emailService = emailService;
             _timer = new Timer(60000); // Check every minute
             _timer.Elapsed += async (sender, e) => await MonitorPrice();
@@ -33,11 +35,11 @@ namespace StockQuoteAlert.Services
         private async Task MonitorPrice()
         {
             var currentPrice = await GetCurrentPrice();
+            _stock.UpdateSalesSituation(currentPrice);
             if(_stock.SalesSituationChanged){
-                var salesSituation = _stock.SalesSituation(currentPrice);
-                var subject = $"Stock Alert: {_stock.AssetSymbol} - {salesSituation}";
+                var subject = $"Stock Alert: {_stock.AssetSymbol} - {_stock.LastSalesSituation}";
                 var body = $"Current price: {currentPrice}";
-                _emailService.SendEmailAlert(null, subject, body);//TODO Revisar o serviço de envio de email
+                _emailService.SendEmail(subject, body);//TODO Revisar o serviço de envio de email
             }
         }
 

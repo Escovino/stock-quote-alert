@@ -5,16 +5,16 @@ The Stock Price Monitor is a C# console application that tracks the stock prices
 
 ## Project Structure
 ```
-StockPriceMonitor
+StockQuoteAlert
 ├── src
 │   ├── Program.cs
 │   ├── Services
-│   │   └── StockPriceService.cs
+│   │   └── StockQuoteAlert.cs
 │   ├── Models
-│   │   └── StockPrice.cs
+│   │   └── Stock.cs
 │   └── Utils
 │       └── EmailService.cs
-├── StockPriceMonitor.csproj
+├── StockQuoteAlert.csproj
 └── README.md
 ```
 

@@ -2,24 +2,24 @@ namespace StockQuoteAlert.Models
 {
     public class Stock
     {
-        private string AssetSymbol { get; set; }
-        private decimal SellingPrice { get; set; }
-        private decimal BuyingPrice { get; set; }
-        private bool SalesSituationChanged { get; set; }
-        private string LastSalesSituation { get; set; }
+        public string AssetSymbol { get; set; }
+        public decimal SellingPrice { get; set; }
+        public decimal BuyingPrice { get; set; }
+        public bool SalesSituationChanged { get; set; }
+        public string LastSalesSituation { get; set; }
     
         public Stock(string assetSymbol, decimal sellingPrice, decimal buyingPrice)
         {
             this.AssetSymbol = assetSymbol;
-            this.SellingPrice = sellPrice;
-            this.BuyingPrice = buyPrice;
-            this.SalesSituationChange = false;
-            this.LastSalesSituation = '';
+            this.SellingPrice = sellingPrice;
+            this.BuyingPrice = buyingPrice;
+            this.SalesSituationChanged = false;
+            this.LastSalesSituation = "";
         }
     
-        public string SalesSituation(int price)
+        public void UpdateSalesSituation(decimal price)
         {
-            int salesSituation = price > this.SellPrice ? 'vender' : price < this.BuyPrice ? 'comprar' : 'manter';
+            string salesSituation = price > this.SellingPrice ? "vender" : price < this.BuyingPrice ? "comprar" : "manter";
 
             if (!salesSituation.Equals(LastSalesSituation))
             {
@@ -29,8 +29,6 @@ namespace StockQuoteAlert.Models
             }
 
             this.LastSalesSituation = salesSituation;
-
-            return salesSituation;
         }
     }
 }

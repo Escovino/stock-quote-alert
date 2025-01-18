@@ -1,7 +1,10 @@
 using System;
-using StockPriceMonitor.Services;
+using Microsoft.Extensions.Configuration;
+using StockQuoteAlert.Services;
+using StockQuoteAlert.Models;
+using StockQuoteAlert.Utils;
 //TODO Revisar progam
-namespace StockPriceMonitor
+namespace StockQuoteAlert
 {
     class Program
     {
@@ -9,7 +12,7 @@ namespace StockPriceMonitor
         {
             if (args.Length < 3)
             {
-                Console.WriteLine("Usage: StockPriceMonitor <AssetSymbol> <SellingPrice> <BuyingPrice>");
+                Console.WriteLine("Usage: StockQuoteAlert <AssetSymbol> <SellingPrice> <BuyingPrice>");
                 return;
             }
 
@@ -26,11 +29,21 @@ namespace StockPriceMonitor
                 return;
             }
 
-            StockPriceService stockPriceService = new StockPriceService(assetSymbol, sellingPrice, buyingPrice);
-            stockPriceService.StartMonitoring();
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            Console.WriteLine("Monitoring started. Press any key to exit...");
+            IConfiguration configuration = builder.Build();
+
+            var emailService = new EmailService(configuration);
+            var stock = new Stock(assetSymbol, sellingPrice, buyingPrice);
+            var stockQuoteAlertService = new StockQuoteAlertService(stock, emailService);
+
+            stockQuoteAlertService.StartMonitoring();
+
+            Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
+            stockQuoteAlertService.StopMonitoring();
         }
     }
 }

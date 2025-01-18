@@ -1,40 +1,48 @@
 using System;
 using System.Net;
 using System.Net.Mail;
-//TODO Revisar o serviço de envio de email
-namespace StockPriceMonitor.Utils
+using Microsoft.Extensions.Configuration;
+
+namespace StockQuoteAlert.Utils
 {
     public class EmailService
     {
-        private readonly string _smtpServer;
-        private readonly int _smtpPort;
-        private readonly string _smtpUser;
-        private readonly string _smtpPass;
-        private readonly string _fromEmail;
+        private readonly IConfiguration _configuration;
 
-        public EmailService(string smtpServer, int smtpPort, string smtpUser, string smtpPass, string fromEmail)
+        public EmailService(IConfiguration configuration)
         {
-            _smtpServer = smtpServer;
-            _smtpPort = smtpPort;
-            _smtpUser = smtpUser;
-            _smtpPass = smtpPass;
-            _fromEmail = fromEmail;
+            _configuration = configuration;
         }
 
-        public void SendEmailAlert(string toEmail, string subject, string body)
+        public void SendEmail(string subject, string body)
         {
-            using (var message = new MailMessage(_fromEmail, toEmail))
-            {
-                message.Subject = subject;
-                message.Body = body;
-                message.IsBodyHtml = true;
+            var emailSettings = _configuration.GetSection("EmailSettings");
 
-                using (var client = new SmtpClient(_smtpServer, _smtpPort))
-                {
-                    client.Credentials = new NetworkCredential(_smtpUser, _smtpPass);
-                    client.EnableSsl = true;
-                    client.Send(message);
-                }
+            var smtpClient = new SmtpClient(emailSettings["SmtpServer"])
+            {
+                Port = int.Parse(emailSettings["SmtpPort"]),
+                Credentials = new NetworkCredential(emailSettings["SenderEmail"], emailSettings["SenderPassword"]),
+                EnableSsl = true,
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(emailSettings["SenderEmail"]),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true,
+            };
+
+            mailMessage.To.Add(emailSettings["RecipientEmail"]);
+
+            try
+            {
+                smtpClient.Send(mailMessage);
+                Console.WriteLine("Email sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send email: {ex.Message}");
             }
         }
     }
