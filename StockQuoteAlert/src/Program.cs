@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using StockQuoteAlert.Services;
 using StockQuoteAlert.Models;
 using StockQuoteAlert.Utils;
-//TODO Revisar progam
+
 namespace StockQuoteAlert
 {
     class Program

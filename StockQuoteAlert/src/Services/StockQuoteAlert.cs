@@ -39,7 +39,7 @@ namespace StockQuoteAlert.Services
             if(_stock.SalesSituationChanged){
                 var subject = $"Stock Alert: {_stock.AssetSymbol} - {_stock.LastSalesSituation}";
                 var body = $"Current price: {currentPrice}";
-                _emailService.SendEmail(subject, body);//TODO Revisar o serviço de envio de email
+                _emailService.SendEmail(subject, body);
             }
         }
 
